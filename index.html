@@ -296,7 +296,7 @@ const MENU=[
 ];
 const S={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 // на своём домене API живёт рядом (/api на хостинге REG.RU), со старых адресов — на Cloudflare
-const API=location.hostname.endsWith('razlivnoy-priobye.ru')?'/api':'https://razlivnoy-priobye.marsel20172.workers.dev';
+const API=location.hostname.endsWith('razlivnoy-priobye.ru')?'':'https://razlivnoy-priobye.marsel20172.workers.dev';
 let cart=S.get('rz_cart',{}), user=S.get('rz_user',null);
 if(user&&!user.auth)user=null; // старый демо-вход без подписи Telegram
 let cat='shawa', stage='cart', sel={}, pick={day:null,time:null}, afterLogin=null;

@@ -154,7 +154,7 @@ li{display:flex;justify-content:space-between;gap:10px;font-size:15px;padding:3p
 
 <script>
 // на своём домене API живёт рядом (/api на хостинге REG.RU), со старых адресов — на Cloudflare
-const API=location.hostname.endsWith('razlivnoy-priobye.ru')?'/api':'https://razlivnoy-priobye.marsel20172.workers.dev';
+const API=location.hostname.endsWith('razlivnoy-priobye.ru')?'':'https://razlivnoy-priobye.marsel20172.workers.dev';
 const pad=n=>String(n).padStart(2,'0');
 let auth=null, filter='active', data={today:'',orders:[]}, timer=null;
 try{auth=sessionStorage.getItem('rz_auth')}catch(e){}
