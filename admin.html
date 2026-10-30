@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<script>if(location.hostname==="razlivnoy-priobye.pages.dev")location.replace("https://larisk32-bot.github.io/razlivnoy-priobye/"+location.pathname.split("/").pop().replace(/^(admin)$/,"admin.html")+location.search+location.hash)</script>
+<script>if(/github\.io$|pages\.dev$|^www\./.test(location.hostname))location.replace("https://razlivnoy-priobye.ru/"+location.pathname.split("/").pop().replace(/^admin$/,"admin.html")+location.search+location.hash)</script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
@@ -153,7 +153,8 @@ li{display:flex;justify-content:space-between;gap:10px;font-size:15px;padding:3p
 <div class="saved" id="saved">Сохранено ✓</div>
 
 <script>
-const API='https://razlivnoy-priobye.marsel20172.workers.dev';
+// на своём домене API живёт рядом (/api на хостинге REG.RU), со старых адресов — на Cloudflare
+const API=location.hostname.endsWith('razlivnoy-priobye.ru')?'/api':'https://razlivnoy-priobye.marsel20172.workers.dev';
 const pad=n=>String(n).padStart(2,'0');
 let auth=null, filter='active', data={today:'',orders:[]}, timer=null;
 try{auth=sessionStorage.getItem('rz_auth')}catch(e){}
