@@ -100,7 +100,9 @@ li{display:flex;justify-content:space-between;gap:10px;font-size:15px;padding:3p
     <span class="logo"><img src="img/logo_strip.jpg" alt="Разливной"></span>
     <h1>Предзаказы</h1>
     <p>Вход для сотрудников магазина.</p>
-    <div id="tgw" style="min-height:48px;display:flex;justify-content:center"></div>
+    <a class="btn tg" id="tgGo" href="#" target="_blank" rel="noopener">Войти через Telegram</a>
+    <p id="tgWait" style="margin:10px 0 0;font-size:13px;color:var(--muted)">Откроется бот, нажмите «Запустить» и вернитесь сюда.</p>
+    <div id="tgw" style="min-height:0;display:flex;justify-content:center;margin-top:8px"></div>
     <div class="or">или</div>
     <form class="pw" id="pwForm" novalidate>
       <input id="lg" placeholder="Логин" autocomplete="username">
@@ -189,12 +191,20 @@ document.getElementById('list').addEventListener('click',async e=>{const b=e.tar
   if(b.dataset.s==='cancelled'&&!confirm('Отменить предзаказ №'+b.dataset.id+'?'))return;
   b.disabled=true;await api('/api/status',{method:'POST',body:JSON.stringify({id:+b.dataset.id,status:b.dataset.s})}).catch(()=>{});load()});
 document.querySelectorAll('.flt').forEach(b=>b.onclick=()=>{document.querySelectorAll('.flt').forEach(x=>x.classList.toggle('on',x===b));filter=b.dataset.f;render()});
-function show(on){document.getElementById('login').classList.toggle('hide',on);document.getElementById('panel').classList.toggle('hide',!on);clearInterval(timer);if(on){load();loadState().catch(()=>{});timer=setInterval(load,30000)}else widget()}
+function show(on){document.getElementById('login').classList.toggle('hide',on);document.getElementById('panel').classList.toggle('hide',!on);clearInterval(timer);if(on){load();loadState().catch(()=>{});timer=setInterval(load,30000)}else{widget();botLogin()}}
 function enter(a){auth=a;try{sessionStorage.setItem('rz_auth',a)}catch(e){}show(true)}
 function logout(){auth=null;try{sessionStorage.removeItem('rz_auth')}catch(e){}show(false)}
 function widget(){const box=document.getElementById('tgw');if(box.childElementCount)return;const sc=document.createElement('script');sc.async=true;sc.src='https://telegram.org/js/telegram-widget.js?22';
-  sc.dataset.telegramLogin='razlivnoy_priobye_bot';sc.dataset.size='large';sc.dataset.radius='12';sc.dataset.lang='ru';sc.dataset.onauth='onTgAuth(user)';box.appendChild(sc)}
+  sc.dataset.telegramLogin='razlivnoy_priobye_bot';sc.dataset.size='medium';sc.dataset.radius='12';sc.dataset.lang='ru';sc.dataset.onauth='onTgAuth(user)';box.appendChild(sc)}
 window.onTgAuth=u=>enter('TG '+btoa(unescape(encodeURIComponent(JSON.stringify(u)))));
+// вход через бота (telegram.org у части операторов не грузится)
+let lp=null;
+function botLogin(){const go=document.getElementById('tgGo');clearInterval(lp);
+  fetch(API+'/api/login/new',{method:'POST'}).then(r=>r.json()).then(j=>{if(!j.code)return;go.href=`https://t.me/${j.bot}?start=login_${j.code}`;const t0=Date.now();
+    lp=setInterval(()=>{if(!document.getElementById('panel').classList.contains('hide')||Date.now()-t0>600e3){clearInterval(lp);return}
+      fetch(API+'/api/login/check?code='+j.code,{cache:'no-store'}).then(r=>r.json()).then(c=>{
+        if(c.ok){clearInterval(lp);fetch(API+'/api/orders',{headers:{Authorization:'Session '+c.session}}).then(r=>{if(r.ok)enter('Session '+c.session);else{document.getElementById('lerr').textContent='Этот Telegram не в списке продавцов. Напишите боту /staff и дождитесь одобрения владельца.';document.getElementById('lerr').classList.remove('hide');botLogin()}})}
+        else if(c.error==='expired'){clearInterval(lp);botLogin()}}).catch(()=>{})},2000)}).catch(()=>{})}
 document.getElementById('pwForm').addEventListener('submit',async e=>{e.preventDefault();
   const lg=document.getElementById('lg').value.trim().toLowerCase(), pw=document.getElementById('pw').value;
   const ok=lg==='admin'&&(await fetch(API+'/api/orders',{headers:{Authorization:'Bearer '+pw}}).then(r=>r.ok).catch(()=>false));

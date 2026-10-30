@@ -253,8 +253,10 @@ textarea{font:600 15px Nunito;color:var(--text);background:var(--bg);border:1px 
   <div class="mbox">
     <div class="tgl"><svg width="34" height="34" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M9.8 15.6 9.4 20c.6 0 .8-.3 1.1-.6l2.7-2.6 5.6 4.1c1 .6 1.8.3 2-.9l3.7-17.3c.3-1.5-.6-2.1-1.6-1.7L1.2 9.4c-1.5.6-1.4 1.4-.3 1.8l5.6 1.7L19.4 4.8c.6-.4 1.2-.2.7.2"/></svg></div>
     <h3>Вход через Telegram</h3>
-    <p>Нажмите кнопку, и Telegram попросит подтвердить вход. Мы увидим только ваше имя, чтобы прислать сообщение о готовности заказа.</p>
-    <div id="tgw" style="min-height:48px;display:flex;justify-content:center"></div>
+    <p>Откроется Telegram с нашим ботом: нажмите «Запустить» (Start) и вернитесь сюда. Мы увидим только ваше имя, чтобы прислать сообщение о готовности заказа.</p>
+    <a class="btn tg" id="tgGo" href="#" target="_blank" rel="noopener" style="width:100%">Открыть Telegram</a>
+    <p id="tgWait" style="margin:14px 0 0;font-size:14px;color:#777">Готовим ссылку…</p>
+    <div id="tgw" style="min-height:0;display:flex;justify-content:center;margin-top:10px"></div>
     <button class="no2" type="button" id="tgNo">Отмена</button>
   </div>
 </div>
@@ -298,7 +300,7 @@ const S={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){ret
 // на своём домене API живёт рядом (/api на хостинге REG.RU), со старых адресов — на Cloudflare
 const API=location.hostname.endsWith('razlivnoy-priobye.ru')?'':'https://razlivnoy-priobye.marsel20172.workers.dev';
 let cart=S.get('rz_cart',{}), user=S.get('rz_user',null);
-if(user&&!user.auth)user=null; // старый демо-вход без подписи Telegram
+if(user&&!user.auth&&!user.session)user=null; // старый демо-вход без подписи Telegram
 let cat='shawa', stage='cart', sel={}, pick={day:null,time:null}, afterLogin=null;
 // настройки из админки: стоп-лист, свои цены, закрытые слоты, пауза приёма
 let ST={stop:[],prices:{},closed:{},paused:false};
@@ -357,15 +359,34 @@ function drawer(){
 }
 function openCart(){document.getElementById('shade').classList.add('on');document.getElementById('drawer').classList.add('on');if(stage==='done')stage='cart';drawer()}
 function closeCart(){document.getElementById('shade').classList.remove('on');document.getElementById('drawer').classList.remove('on')}
-// Telegram Login Widget: бот @razlivnoy_priobye_bot, домен привязан в BotFather
-function login(then){afterLogin=then||null;document.getElementById('tgModal').classList.add('on');
+// Вход через бота: код → t.me/бот?start=login_КОД → покупатель жмёт Start → сайт забирает сессию.
+// Не зависит от telegram.org в браузере (его режут у части операторов). Виджет — запасной вариант, если загрузится.
+let loginPoll=null;
+function login(then){afterLogin=then||null;document.getElementById('tgModal').classList.add('on');startBotLogin();
   const box=document.getElementById('tgw');if(box.childElementCount)return;
   const sc=document.createElement('script');sc.async=true;sc.src='https://telegram.org/js/telegram-widget.js?22';
-  sc.dataset.telegramLogin='razlivnoy_priobye_bot';sc.dataset.size='large';sc.dataset.radius='12';sc.dataset.lang='ru';sc.dataset.onauth='onTgAuth(user)';sc.dataset.requestAccess='write';
+  sc.dataset.telegramLogin='razlivnoy_priobye_bot';sc.dataset.size='medium';sc.dataset.radius='12';sc.dataset.lang='ru';sc.dataset.onauth='onTgAuth(user)';sc.dataset.requestAccess='write';
   box.appendChild(sc)}
+function startBotLogin(){
+  const go=document.getElementById('tgGo'),w=document.getElementById('tgWait');clearInterval(loginPoll);
+  go.style.pointerEvents='none';go.style.opacity='.6';w.textContent='Готовим ссылку…';
+  fetch(API+'/api/login/new',{method:'POST'}).then(r=>r.json()).then(j=>{
+    if(!j.code){w.textContent=j.error||'Не получилось, попробуйте ещё раз';return}
+    go.href=`https://t.me/${j.bot}?start=login_${j.code}`;go.style.pointerEvents='';go.style.opacity='';
+    w.textContent='Нажмите кнопку, в Telegram нажмите «Запустить», и вход произойдёт сам.';
+    const t0=Date.now();
+    loginPoll=setInterval(()=>{
+      if(!document.getElementById('tgModal').classList.contains('on')||Date.now()-t0>600e3){clearInterval(loginPoll);return}
+      fetch(API+'/api/login/check?code='+j.code,{cache:'no-store'}).then(r=>r.json()).then(c=>{
+        if(c.ok){clearInterval(loginPoll);user={name:c.user.name||'Гость',tg:c.user.username?'@'+c.user.username:'Telegram',session:c.session};
+          S.set('rz_user',user);document.getElementById('tgModal').classList.remove('on');renderWho();drawer();if(afterLogin)afterLogin()}
+        else if(c.error==='expired'){clearInterval(loginPoll);startBotLogin()}
+      }).catch(()=>{})},2000);
+  }).catch(()=>{w.textContent='Нет связи с сервером, попробуйте ещё раз'})}
+document.getElementById('tgGo').addEventListener('click',()=>{document.getElementById('tgWait').textContent='Ждём подтверждения из Telegram… Вернитесь сюда после нажатия «Запустить».'});
 window.onTgAuth=u=>{user={name:[u.first_name,u.last_name].filter(Boolean).join(' ')||'Гость',tg:u.username?'@'+u.username:'Telegram',auth:u};
   S.set('rz_user',user);document.getElementById('tgModal').classList.remove('on');renderWho();drawer();if(afterLogin)afterLogin()};
-document.getElementById('tgNo').onclick=()=>document.getElementById('tgModal').classList.remove('on');
+document.getElementById('tgNo').onclick=()=>{clearInterval(loginPoll);document.getElementById('tgModal').classList.remove('on')};
 
 document.addEventListener('click',e=>{
   const t=e.target.closest('[data-c],[data-add],[data-opt],[data-q],[data-open-cart],[data-day],[data-time],[data-login],#send,#again');if(!t)return;
@@ -385,7 +406,7 @@ document.addEventListener('click',e=>{
     const d=new Date(pick.day+'T00:00'), when=`${fmtDay(d)}, ${d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'})}, ${pick.time}`;
     const note=document.getElementById('note').value.trim();
     t.disabled=true;t.textContent='Отправляем…';
-    fetch(API+'/api/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({auth:user.auth,day:pick.day,time:pick.time,note,items:Object.entries(cart).map(([k,q])=>({k,q}))})})
+    fetch(API+'/api/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...(user.session?{session:user.session}:{auth:user.auth}),day:pick.day,time:pick.time,note,items:Object.entries(cart).map(([k,q])=>({k,q}))})})
      .then(r=>r.json().then(j=>[r.status,j])).then(([st,j])=>{
       if(st!==200){if(st===401){user=null;S.set('rz_user',null);renderWho()}drawer();const e2=document.getElementById('err');e2.textContent=j.error||'Не получилось отправить';e2.style.display='block';return}
       cart={};S.set('rz_cart',cart);document.querySelectorAll('.cnt').forEach(e=>e.textContent=0);grid();stage='done';
