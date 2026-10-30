@@ -67,14 +67,14 @@ li{display:flex;justify-content:space-between;gap:10px;font-size:15px;padding:3p
 </style>
 </head>
 <body>
-<div class="demo-bar">Демо-админка: тестовые предзаказы + заказы, оформленные на этом устройстве</div>
+<div class="demo-bar">Админка «Разливного» · данные с сервера</div>
 
 <section class="login" id="login">
   <div class="lbox">
     <span class="logo"><img src="img/logo_strip.jpg" alt="Разливной"></span>
     <h1>Предзаказы</h1>
     <p>Вход для сотрудников магазина.</p>
-    <button class="btn tg" id="tgLogin" type="button">Войти через Telegram</button>
+    <div id="tgw" style="min-height:48px;display:flex;justify-content:center"></div>
     <div class="or">или</div>
     <form class="pw" id="pwForm" novalidate>
       <input id="lg" placeholder="Логин" autocomplete="username">
@@ -82,7 +82,7 @@ li{display:flex;justify-content:space-between;gap:10px;font-size:15px;padding:3p
       <p class="lerr hide" id="lerr">Неверный логин или пароль</p>
       <button class="btn" type="submit">Войти</button>
     </form>
-    <small>Демо: логин <b>admin</b>, пароль <b>razlivnoy</b>. В рабочей версии пароль проверяет сервер, а Telegram пускает только сотрудников из списка.</small>
+    <small>Через Telegram пускает только владельца и одобренных продавцов (продавец пишет боту /staff, владелец одобряет).</small>
   </div>
 </section>
 
@@ -101,55 +101,58 @@ li{display:flex;justify-content:space-between;gap:10px;font-size:15px;padding:3p
       <button class="flt" data-f="issued" type="button">Выданные</button>
     </div>
     <div id="list"></div>
-    <p class="note">В рабочей версии каждый новый предзаказ сразу приходит в Telegram магазина, а здесь сотрудники отмечают «Готов» и «Выдан».</p>
+    <p class="note">Новые предзаказы также приходят в Telegram от @razlivnoy_priobye_bot. Статусы синхронизируются: нажали «Готов» здесь — обновится и в Telegram, и покупателю придёт сообщение. Список обновляется каждые 30 секунд.</p>
   </main>
 </div>
 
 <script>
-const S={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const API='https://razlivnoy-priobye.marsel20172.workers.dev';
 const pad=n=>String(n).padStart(2,'0');
-const dk=off=>{const d=new Date();d.setDate(d.getDate()+off);return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
-const SAMPLE=[
- {no:412,day:dk(0),time:'13:00',user:{name:'Алексей',tg:'@alex_demo'},items:[{n:'Гигант',q:1,p:330},{n:'Картофель фри',q:1,p:130}],total:460,note:'',status:'ready'},
- {no:415,day:dk(0),time:'18:30',user:{name:'Ольга',tg:'@olga_demo'},items:[{n:'Пепперони · 30 см',q:1,p:690},{n:'Сырные палочки',q:2,p:160}],total:1010,note:'Нарезать на 8 кусочков',status:'new'},
- {no:417,day:dk(0),time:'19:00',user:{name:'Дмитрий',tg:'@dima_demo'},items:[{n:'Острая',q:2,p:230},{n:'Крылья баффало',q:1,p:150}],total:610,note:'',status:'new'},
- {no:409,day:dk(0),time:'11:30',user:{name:'Ирина',tg:'@ira_demo'},items:[{n:'Классика',q:1,p:210}],total:210,note:'',status:'issued'},
- {no:420,day:dk(1),time:'12:00',user:{name:'Сергей',tg:'@serg_demo'},items:[{n:'UFO Burger',q:2,p:250},{n:'Луковые кольца',q:1,p:150}],total:650,note:'',status:'new'}
-];
-let st=S.get('rz_status',{}), filter='active';
-const all=()=>[...S.get('rz_orders',[]).map(o=>({...o,mine:true})),...SAMPLE].map(o=>({...o,status:st[o.no]||o.status}));
-const label=d=>d===dk(0)?'Сегодня':d===dk(1)?'Завтра':new Date(d+'T00:00').toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let auth=null, filter='active', data={today:'',orders:[]}, timer=null;
+try{auth=sessionStorage.getItem('rz_auth')}catch(e){}
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const rub=n=>n.toLocaleString('ru-RU')+' ₽';
-const SN={new:'новый',ready:'готов',issued:'выдан'};
+const SN={new:'новый',ready:'готов',issued:'выдан',cancelled:'отменён'};
+const addDays=(day,n)=>{const d=new Date(day+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)};
+const label=d=>d===data.today?'Сегодня':d===addDays(data.today,1)?'Завтра':new Date(d+'T00:00:00Z').toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long',timeZone:'UTC'});
+async function api(path,opt={}){const r=await fetch(API+path,{...opt,headers:{'Content-Type':'application/json',Authorization:auth,...(opt.headers||{})}});if(r.status===401){logout();throw new Error('auth')}return r.json()}
+async function load(){try{data=await api('/api/orders');render()}catch(e){if(e.message!=='auth')document.getElementById('list').innerHTML='<p class="empty">Нет связи с сервером, пробую ещё…</p>'}}
 function render(){
-  const A=all(), today=A.filter(o=>o.day===dk(0));
+  const A=data.orders, today=A.filter(o=>o.day===data.today);
   document.getElementById('sNew').textContent=A.filter(o=>o.status==='new').length;
   document.getElementById('sReady').textContent=A.filter(o=>o.status==='ready').length;
-  document.getElementById('sSum').textContent=rub(today.filter(o=>o.status!=='issued').reduce((s,o)=>s+o.total,0));
-  const rows=A.filter(o=>filter==='all'||(filter==='issued'?o.status==='issued':o.status!=='issued')).sort((a,b)=>(a.day+a.time).localeCompare(b.day+b.time));
+  document.getElementById('sSum').textContent=rub(today.filter(o=>o.status!=='cancelled').reduce((s,o)=>s+o.total,0));
+  const rows=A.filter(o=>filter==='all'||(filter==='issued'?(o.status==='issued'||o.status==='cancelled'):(o.status==='new'||o.status==='ready')));
   if(!rows.length){document.getElementById('list').innerHTML='<p class="empty">Предзаказов нет</p>';return}
   let html='',lastDay='';
   for(const o of rows){
     if(o.day!==lastDay){html+=`<div class="dayh">${label(o.day)}</div>`;lastDay=o.day}
-    html+=`<div class="o ${o.status}"><div class="oh"><div><div class="time">${o.time}</div><div class="no">№${o.no}</div></div>
-      <div class="who">${esc(o.user.name)}<br><a href="https://t.me/${esc(o.user.tg.replace('@',''))}" target="_blank" rel="noopener">${esc(o.user.tg)}</a></div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start">${o.mine?'<span class="st mine">с этого устройства</span>':''}<span class="st ${o.status}">${SN[o.status]}</span></div></div>
+    const st=o.status==='cancelled'?'issued':o.status;
+    html+=`<div class="o ${st}"><div class="oh"><div><div class="time">${o.time}</div><div class="no">№${o.id}</div></div>
+      <div class="who">${esc(o.name)}<br>${o.username?`<a href="https://t.me/${esc(o.username)}" target="_blank" rel="noopener">@${esc(o.username)}</a>`:`<a href="tg://user?id=${o.user_id}">написать в Telegram</a>`}</div>
+      <span class="st ${st}">${SN[o.status]}</span></div>
       <ul>${o.items.map(i=>`<li><span>${esc(i.n)} × ${i.q}</span><span>${rub(i.p*i.q)}</span></li>`).join('')}</ul>
       <div class="tot"><span>Итого</span><span>${rub(o.total)}</span></div>${o.note?`<div class="nt">💬 ${esc(o.note)}</div>`:''}
-      <div class="acts">${o.status==='new'?`<button class="a-ready" data-s="ready" data-no="${o.no}" type="button">✓ Готов</button>`:''}${o.status==='ready'?`<button class="a-issue" data-s="issued" data-no="${o.no}" type="button">Выдан</button>`:''}${o.status!=='new'?`<button class="a-back" data-s="new" data-no="${o.no}" type="button">Вернуть в работу</button>`:''}</div></div>`;
+      <div class="acts">${o.status==='new'?`<button class="a-ready" data-s="ready" data-id="${o.id}" type="button">✓ Готов</button>`:''}${o.status==='ready'?`<button class="a-issue" data-s="issued" data-id="${o.id}" type="button">Выдан</button>`:''}${o.status==='new'||o.status==='ready'?`<button class="a-back" data-s="cancelled" data-id="${o.id}" type="button">Отменить</button>`:`<button class="a-back" data-s="new" data-id="${o.id}" type="button">Вернуть в работу</button>`}</div></div>`;
   }
   document.getElementById('list').innerHTML=html;
 }
-document.getElementById('list').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b)return;st[b.dataset.no]=b.dataset.s;S.set('rz_status',st);render()});
+document.getElementById('list').addEventListener('click',async e=>{const b=e.target.closest('[data-s]');if(!b)return;
+  if(b.dataset.s==='cancelled'&&!confirm('Отменить предзаказ №'+b.dataset.id+'?'))return;
+  b.disabled=true;await api('/api/status',{method:'POST',body:JSON.stringify({id:+b.dataset.id,status:b.dataset.s})}).catch(()=>{});load()});
 document.querySelectorAll('.flt').forEach(b=>b.onclick=()=>{document.querySelectorAll('.flt').forEach(x=>x.classList.toggle('on',x===b));filter=b.dataset.f;render()});
-function show(on){document.getElementById('login').classList.toggle('hide',on);document.getElementById('panel').classList.toggle('hide',!on);if(on)render()}
-const enter=()=>{try{sessionStorage.setItem('rz_admin','1')}catch(e){}show(true)};
-document.getElementById('tgLogin').onclick=enter;
-document.getElementById('pwForm').addEventListener('submit',e=>{e.preventDefault();const ok=document.getElementById('lg').value.trim().toLowerCase()==='admin'&&document.getElementById('pw').value==='razlivnoy';document.getElementById('lerr').classList.toggle('hide',ok);if(ok){document.getElementById('pw').value='';enter()}});
-document.getElementById('logout').onclick=()=>{try{sessionStorage.removeItem('rz_admin')}catch(e){}show(false)};
-let logged=false;try{logged=sessionStorage.getItem('rz_admin')==='1'}catch(e){}
-show(logged);
+function show(on){document.getElementById('login').classList.toggle('hide',on);document.getElementById('panel').classList.toggle('hide',!on);clearInterval(timer);if(on){load();timer=setInterval(load,30000)}else widget()}
+function enter(a){auth=a;try{sessionStorage.setItem('rz_auth',a)}catch(e){}show(true)}
+function logout(){auth=null;try{sessionStorage.removeItem('rz_auth')}catch(e){}show(false)}
+function widget(){const box=document.getElementById('tgw');if(box.childElementCount)return;const sc=document.createElement('script');sc.async=true;sc.src='https://telegram.org/js/telegram-widget.js?22';
+  sc.dataset.telegramLogin='razlivnoy_priobye_bot';sc.dataset.size='large';sc.dataset.radius='12';sc.dataset.onauth='onTgAuth(user)';box.appendChild(sc)}
+window.onTgAuth=u=>enter('TG '+btoa(unescape(encodeURIComponent(JSON.stringify(u)))));
+document.getElementById('pwForm').addEventListener('submit',async e=>{e.preventDefault();
+  const lg=document.getElementById('lg').value.trim().toLowerCase(), pw=document.getElementById('pw').value;
+  const ok=lg==='admin'&&(await fetch(API+'/api/orders',{headers:{Authorization:'Bearer '+pw}}).then(r=>r.ok).catch(()=>false));
+  document.getElementById('lerr').classList.toggle('hide',ok);if(ok){document.getElementById('pw').value='';enter('Bearer '+pw)}});
+document.getElementById('logout').onclick=logout;
+show(!!auth);
 </script>
 </body>
 </html>
