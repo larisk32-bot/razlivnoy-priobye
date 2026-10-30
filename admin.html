@@ -145,7 +145,7 @@ function show(on){document.getElementById('login').classList.toggle('hide',on);d
 function enter(a){auth=a;try{sessionStorage.setItem('rz_auth',a)}catch(e){}show(true)}
 function logout(){auth=null;try{sessionStorage.removeItem('rz_auth')}catch(e){}show(false)}
 function widget(){const box=document.getElementById('tgw');if(box.childElementCount)return;const sc=document.createElement('script');sc.async=true;sc.src='https://telegram.org/js/telegram-widget.js?22';
-  sc.dataset.telegramLogin='razlivnoy_priobye_bot';sc.dataset.size='large';sc.dataset.radius='12';sc.dataset.onauth='onTgAuth(user)';box.appendChild(sc)}
+  sc.dataset.telegramLogin='razlivnoy_priobye_bot';sc.dataset.size='large';sc.dataset.radius='12';sc.dataset.lang='ru';sc.dataset.onauth='onTgAuth(user)';box.appendChild(sc)}
 window.onTgAuth=u=>enter('TG '+btoa(unescape(encodeURIComponent(JSON.stringify(u)))));
 document.getElementById('pwForm').addEventListener('submit',async e=>{e.preventDefault();
   const lg=document.getElementById('lg').value.trim().toLowerCase(), pw=document.getElementById('pw').value;
