@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Разливной, Приобье: предзаказ еды</title>
+<meta name="description" content="Разливной пивмаркет, Приобье. Шаурма, бургеры, пицца, хот-доги и закуски. Предзаказ к нужному времени: оформили, пришли и забрали горячим.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;900&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1b120c; --bg2:#26190f; --bg3:#332214; --line:rgba(255,214,120,.14);
+  --text:#fff6e6; --muted:#cdb898;
+  --gold:#f7b500; --gold2:#ffc933; --red:#e52b2b; --tg:#2aabee;
+  --wrap:1160px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font:400 17px/1.55 Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;color:inherit}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 20px}
+.rk{font-family:Rubik,system-ui,sans-serif}
+.demo-bar{background:var(--gold);color:#1b120c;text-align:center;font:800 13px/1.3 Nunito;padding:7px 16px}
+
+header{position:sticky;top:0;z-index:30;background:rgba(27,18,12,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:12px}
+.logo img{height:44px;width:auto;border-radius:10px}
+.hbtns{display:flex;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 24px;border-radius:14px;background:var(--gold);color:#1b120c;font:700 17px/1 Rubik;border:0;transition:transform .15s,background .15s;box-shadow:0 5px 0 #a87a00}
+.btn:hover{background:var(--gold2);transform:translateY(-2px)}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #a87a00}
+.btn.ghost{background:transparent;color:var(--text);border:2px solid var(--line);box-shadow:none}
+.btn.tg{background:var(--tg);color:#fff;box-shadow:0 5px 0 #1a7fb3}
+.btn.sm{padding:10px 14px;font-size:15px;box-shadow:0 3px 0 #a87a00}
+.btn.tg.sm{box-shadow:0 3px 0 #1a7fb3}
+.cnt{background:var(--red);color:#fff;border-radius:999px;min-width:22px;height:22px;display:inline-grid;place-items:center;font:800 12px Nunito;padding:0 6px}
+.user{display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px;color:var(--muted)}
+.ava{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--tg),#7b4dff);display:grid;place-items:center;color:#fff;font-weight:900}
+
+/* hero */
+.hero{position:relative;padding:0}
+.hero .bnr{position:relative;background:url(img/wood.jpg) center/cover;border-bottom:4px solid var(--gold)}
+.hero .bnr::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(27,18,12,.15),rgba(27,18,12,.55))}
+.hero .bnr .wrap{position:relative;z-index:1;padding-top:54px;padding-bottom:58px;display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:center}
+.hero .lg{max-width:560px;width:100%;filter:drop-shadow(0 14px 30px rgba(0,0,0,.5));border-radius:18px}
+.hero h1{font:900 clamp(30px,4.2vw,50px)/1.05 Rubik;margin:26px 0 14px;text-shadow:0 3px 12px rgba(0,0,0,.5)}
+.hero h1 span{color:var(--gold)}
+.hero p{font-size:19px;color:#f1e3c9;max-width:540px;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+.hero .cta{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px}
+.how{display:grid;gap:12px}
+.how div{display:flex;gap:14px;align-items:center;background:rgba(27,18,12,.82);border:1px solid var(--line);border-radius:18px;padding:16px 18px;backdrop-filter:blur(4px)}
+.how b{flex:none;width:44px;height:44px;border-radius:50%;background:var(--gold);color:#1b120c;display:grid;place-items:center;font:900 20px Rubik}
+.how span{font-weight:800}
+.how small{display:block;color:var(--muted);font-weight:600}
+
+section{padding:70px 0}
+.head{display:flex;justify-content:space-between;align-items:end;gap:18px;flex-wrap:wrap;margin-bottom:24px}
+.head h2{font:900 clamp(32px,4.6vw,52px)/1 Rubik}
+.head h2 span{color:var(--gold)}
+.head p{color:var(--muted);max-width:430px}
+
+/* promo */
+.promo .box{display:grid;grid-template-columns:1fr 1fr;border-radius:26px;overflow:hidden;background:linear-gradient(120deg,#6b2410,#3a170b);border:1px solid rgba(247,181,0,.35)}
+.promo img{width:100%;height:100%;object-fit:cover;min-height:280px}
+.promo .t{padding:38px}
+.promo .k{font:800 13px/1 Nunito;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.promo h3{font:900 clamp(32px,4vw,52px)/1 Rubik;margin:12px 0 12px}
+.promo h3 span{color:var(--red);-webkit-text-stroke:1px #fff}
+.promo p{color:#f1d9c0;margin-bottom:20px}
+.promo .pr{font:900 44px/1 Rubik;color:#fff;background:var(--red);display:inline-block;padding:8px 16px;border-radius:12px;margin-bottom:20px}
+
+/* menu */
+.tabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;position:sticky;top:64px;z-index:10;background:var(--bg);padding:10px 0;margin-bottom:18px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:10px 18px;font-weight:800;font-size:15px;color:var(--muted)}
+.tab.on{background:var(--gold);border-color:var(--gold);color:#1b120c}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.item{background:var(--bg2);border:1px solid var(--line);border-radius:20px;padding:18px;display:flex;flex-direction:column}
+.item .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.item h4{font:700 21px/1.15 Rubik;text-transform:uppercase}
+.item .ic{font-size:30px;line-height:1}
+.item p{font-size:14px;color:var(--muted);margin-top:6px;flex:1}
+.item .w{font-size:13px;color:var(--muted);font-weight:800;margin-top:8px}
+.opts{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.opt{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:7px 10px;font-weight:800;font-size:13px;color:var(--muted)}
+.opt.on{border-color:var(--gold);color:var(--gold)}
+.item .row{display:flex;align-items:center;justify-content:space-between;margin-top:14px;gap:10px}
+.price{font:900 24px/1 Rubik;background:var(--red);color:#fff;padding:7px 12px;border-radius:10px}
+.add{background:var(--gold);color:#1b120c;border:0;border-radius:12px;padding:11px 14px;font:800 14px Nunito}
+.add.in{background:var(--bg3);color:var(--gold);border:1px solid var(--gold)}
+.badge{display:inline-block;font:800 11px/1 Nunito;letter-spacing:.05em;text-transform:uppercase;padding:5px 8px;border-radius:6px;margin-top:8px;align-self:flex-start}
+.badge.hot{background:var(--red);color:#fff}.badge.veg{background:#2f9e44;color:#fff}.badge.new{background:var(--gold);color:#1b120c}
+
+/* info */
+.info{background:var(--bg2);border-top:1px solid var(--line)}
+.cbox{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cc{background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:24px}
+.cc dt{font:800 12px/1 Nunito;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.cc dd{font-size:19px;font-weight:700}
+.cc dd small{display:block;color:var(--muted);font-size:14px;font-weight:600;margin-top:4px}
+footer{padding:24px 0 30px;color:var(--muted);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* drawer + modal */
+.shade{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40;opacity:0;pointer-events:none;transition:opacity .2s}
+.shade.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(450px,100%);background:var(--bg2);z-index:41;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;border-left:1px solid var(--line)}
+.drawer.on{transform:none}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
+.dh h3{font:900 24px/1 Rubik}
+.x{background:none;border:0;font-size:26px;color:var(--muted);line-height:1}
+.dbody{flex:1;overflow:auto;padding:14px 20px}
+.dfoot{padding:14px 20px 20px;border-top:1px solid var(--line)}
+.ci{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.ci .t{flex:1;font-weight:800;font-size:15px;line-height:1.25}
+.ci .t small{display:block;color:var(--muted);font-weight:600}
+.qty{display:flex;align-items:center;gap:8px}
+.qty button{width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:var(--bg3);font-weight:800}
+.empty{color:var(--muted);text-align:center;padding:40px 0}
+.lbl{font:800 13px/1 Nunito;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:18px 0 10px}
+.days,.slots{display:flex;gap:8px;flex-wrap:wrap}
+.day,.slot{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:9px 12px;font-weight:800;font-size:14px;color:var(--muted);text-align:center}
+.day small{display:block;font-weight:600;font-size:12px}
+.day.on,.slot.on{background:var(--gold);border-color:var(--gold);color:#1b120c}
+.day:disabled,.slot:disabled{opacity:.35;cursor:not-allowed}
+.slots{max-height:176px;overflow:auto}
+textarea{font:600 15px Nunito;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px;width:100%;resize:vertical}
+.me{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px}
+.me b{display:block}.me small{color:var(--muted)}
+.sum{display:flex;justify-content:space-between;font:900 24px Rubik;margin-bottom:12px}
+.dfoot .btn{width:100%}
+.err{color:#ff8a80;font-weight:800;font-size:14px;margin-top:10px;display:none}
+.done{text-align:center;padding:10px 0}
+.done h3{font:900 28px/1.1 Rubik;color:var(--gold);margin-bottom:8px}
+.done .no{display:inline-block;font:900 36px/1 Rubik;background:var(--gold);color:#1b120c;border-radius:14px;padding:12px 20px;margin:12px 0}
+.done pre{text-align:left;white-space:pre-wrap;font:600 14px/1.5 Nunito;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
+.modal{position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:16px;background:rgba(0,0,0,.65)}
+.modal.on{display:grid}
+.mbox{background:#fff;color:#111;border-radius:22px;max-width:380px;width:100%;padding:26px;text-align:center}
+.mbox .tgl{width:64px;height:64px;border-radius:50%;background:var(--tg);display:grid;place-items:center;margin:0 auto 14px}
+.mbox h3{font:700 20px/1.2 Rubik;margin-bottom:6px}
+.mbox p{color:#555;font-size:15px;margin-bottom:16px}
+.mbox input{font:600 16px Nunito;border:1px solid #ccd;border-radius:12px;padding:12px 14px;width:100%;margin-bottom:12px;color:#111}
+.mbox .btn{width:100%}
+.mbox .no2{background:none;border:0;color:#888;margin-top:12px;font-weight:700}
+.fab{display:none}
+@media (max-width:900px){.grid{grid-template-columns:1fr 1fr}}
+@media (max-width:760px){
+  .hbtns .hide-m{display:none}
+  .hero .bnr .wrap,.promo .box{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr}
+  .cbox{grid-template-columns:1fr}
+  section{padding:54px 0}
+  .promo .t{padding:26px 22px}
+  .fab{display:flex;position:fixed;left:12px;right:12px;bottom:14px;z-index:35}
+  .fab .btn{flex:1;padding:16px}
+  footer{padding-bottom:96px}
+}
+</style>
+</head>
+<body>
+<div class="demo-bar">Демо-сайт: вход через Telegram и заказ имитируются, ничего никуда не отправляется</div>
+
+<header>
+  <div class="wrap">
+    <a class="logo" href="#top"><img src="img/logo_strip.jpg" alt="Разливной пивмаркет"></a>
+    <div class="hbtns">
+      <span id="who"></span>
+      <button class="btn sm hide-m" type="button" data-open-cart>Корзина <span class="cnt">0</span></button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="bnr">
+      <div class="wrap">
+        <div>
+          <img class="lg" src="img/logo_strip.jpg" alt="Разливной пивмаркет">
+          <h1>Закажи заранее,<br><span>забери горячим</span></h1>
+          <p>Шаурма, бургеры, пицца, хот-доги и закуски. Выберите день и время, и к вашему приходу всё будет готово. Без очереди и ожидания.</p>
+          <div class="cta">
+            <a class="btn" href="#menu">Сделать предзаказ</a>
+            <button class="btn tg" type="button" data-login>Войти через Telegram</button>
+          </div>
+        </div>
+        <div class="how">
+          <div><b>1</b><span>Выберите еду<small>из меню ниже</small></span></div>
+          <div><b>2</b><span>Укажите день и время<small>когда удобно забрать</small></span></div>
+          <div><b>3</b><span>Войдите через Telegram<small>в одно касание, без паролей</small></span></div>
+          <div><b>4</b><span>Приходите и забирайте<small>оплата на месте</small></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="promo">
+    <div class="wrap">
+      <div class="box">
+        <img src="img/ufo.jpg" alt="UFO Burger">
+        <div class="t">
+          <span class="k">🔥 Новинка</span>
+          <h3>UFO <span>BURGER</span></h3>
+          <p>Булочка, говяжья котлета, сыр чеддер, капустный салат, сырный и томатный соус.</p>
+          <div class="pr">250 ₽</div><br>
+          <button class="btn" type="button" data-add="u1">+ В предзаказ</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="menu">
+    <div class="wrap">
+      <div class="head">
+        <h2>Меню <span>«Разливного»</span></h2>
+        <p>Цены и граммовка как на экранах в магазине.</p>
+      </div>
+      <div class="tabs" id="tabs"></div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section class="info" id="info">
+    <div class="wrap">
+      <div class="head"><h2>Где <span>забрать</span></h2></div>
+      <div class="cbox">
+        <dl class="cc"><dt>Адрес</dt><dd>пгт Приобье, ул. Школьная, 9<small><a href="https://yandex.ru/maps/?text=%D0%9F%D1%80%D0%B8%D0%BE%D0%B1%D1%8C%D0%B5%2C%20%D0%A8%D0%BA%D0%BE%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F%209" target="_blank" rel="noopener" style="color:var(--gold)">Открыть на карте →</a></small></dd></dl>
+        <dl class="cc"><dt>Часы работы</dt><dd>Ежедневно 10:00–23:00<small>предзаказ на любое время в часы работы</small></dd></dl>
+        <dl class="cc"><dt>Телефон</dt><dd><a href="tel:+79224441882">+7 922 444-18-82</a><small>оплата при получении</small></dd></dl>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap"><span>© «Разливной» пивмаркет · Приобье, Школьная, 9</span><a href="tel:+79224441882">+7 922 444-18-82</a></div></footer>
+
+<div class="fab"><button class="btn" type="button" data-open-cart>Мой предзаказ · <span class="cnt">0</span></button></div>
+
+<div class="shade" id="shade"></div>
+<aside class="drawer" id="drawer" aria-label="Предзаказ">
+  <div class="dh"><h3>Предзаказ</h3><button class="x" type="button" id="close" aria-label="Закрыть">✕</button></div>
+  <div class="dbody" id="dbody"></div>
+  <div class="dfoot" id="dfoot"></div>
+</aside>
+
+<div class="modal" id="tgModal">
+  <div class="mbox">
+    <div class="tgl"><svg width="34" height="34" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M9.8 15.6 9.4 20c.6 0 .8-.3 1.1-.6l2.7-2.6 5.6 4.1c1 .6 1.8.3 2-.9l3.7-17.3c.3-1.5-.6-2.1-1.6-1.7L1.2 9.4c-1.5.6-1.4 1.4-.3 1.8l5.6 1.7L19.4 4.8c.6-.4 1.2-.2.7.2"/></svg></div>
+    <h3>Вход через Telegram</h3>
+    <p>Демо: в рабочей версии Telegram сам подставит имя и попросит подтвердить вход в приложении.</p>
+    <input id="tgName" placeholder="Ваше имя" autocomplete="given-name">
+    <button class="btn tg" type="button" id="tgOk">Подтвердить вход</button>
+    <button class="no2" type="button" id="tgNo">Отмена</button>
+  </div>
+</div>
+
+<script>
+const OPEN=10, CLOSE=23; // часы работы магазина
+const CATS=[['shawa','Шаурма'],['burger','Бургеры'],['snacks','Закуски'],['pizza','Пицца'],['hot','Хот-доги']];
+const MENU=[
+ {id:'s1',c:'shawa',n:'Мини',d:'Курочка в домашнем маринаде, морковка по-корейски, огурчики, капустный салатик, фирменный соус',p:150,w:'150 г',ic:'🌯'},
+ {id:'s2',c:'shawa',n:'Классика',d:'Курочка в домашнем маринаде, морковка по-корейски, огурчики, капустный салатик, фирменный соус',p:210,w:'270 г',ic:'🌯'},
+ {id:'s3',c:'shawa',n:'Веган',d:'Картофель фри, морковка по-корейски, огурчики, капустный салатик, фирменный соус',p:180,w:'165 г',ic:'🌯',b:['veg','веган']},
+ {id:'s4',c:'shawa',n:'Сырная',d:'Курочка, сыр моцарелла, сырный соус, морковка по-корейски, огурчики, капустный салатик',p:230,w:'300 г',ic:'🌯'},
+ {id:'s5',c:'shawa',n:'Острая',d:'Курочка, острый перец халапеньо, морковка по-корейски, огурчики, капустный салатик',p:230,w:'300 г',ic:'🌶️',b:['hot','острая']},
+ {id:'s6',c:'shawa',n:'Грибная',d:'Курочка, жареные грибочки, морковка по-корейски, огурчики, капустный салатик',p:230,w:'300 г',ic:'🍄'},
+ {id:'s7',c:'shawa',n:'Сытная',d:'Курочка, картошка фри, морковка по-корейски, огурчики, капустный салатик',p:250,w:'350 г',ic:'🌯'},
+ {id:'s8',c:'shawa',n:'Гигант',d:'Двойная порция курочки, морковка по-корейски, огурчики, капустный салатик, фирменный соус',p:330,w:'370 г',ic:'💪'},
+ {id:'s9',c:'shawa',n:'Сосиска в лаваше',d:'Сосиска из говядины, морковка по-корейски, огурчики, капустный салатик, фирменный соус',p:210,w:'270 г',ic:'🌭'},
+ {id:'s10',c:'shawa',n:'Сделай вкуснее',d:'Добавка: сыр моцарелла, жареный лук, халапеньо, жареные грибы, соусы в ассортименте',p:30,w:'30 г',ic:'✨'},
+ {id:'u1',c:'burger',n:'UFO Burger',d:'Булочка, говяжья котлета, сыр чеддер, капустный салат, сырный соус, томатный соус',p:250,ic:'🛸',b:['new','новинка']},
+ {id:'n1',c:'snacks',n:'Гренки чесночные',d:'Хрустящие, с чесноком',p:110,w:'100 г',ic:'🥖'},
+ {id:'n2',c:'snacks',n:'Картофель фри',d:'Золотистый и хрустящий',p:130,w:'100 г',ic:'🍟'},
+ {id:'n3',c:'snacks',n:'Картофель по-деревенски',d:'Дольками, со специями',p:130,w:'100 г',ic:'🥔'},
+ {id:'n4',c:'snacks',n:'Наггетсы',d:'Куриные, в хрустящей панировке',p:140,w:'6 шт',ic:'🍗'},
+ {id:'n5',c:'snacks',n:'Луковые кольца',d:'В хрустящем кляре',p:150,w:'100 г',ic:'🧅'},
+ {id:'n6',c:'snacks',n:'Крылья баффало',d:'Острые куриные крылышки',p:150,w:'100 г',ic:'🔥'},
+ {id:'n7',c:'snacks',n:'Сырные палочки',d:'Тянущийся сыр в панировке',p:160,w:'5 шт',ic:'🧀'},
+ {id:'n8',c:'snacks',n:'Креветки фри',d:'Креветки в панировке',p:160,w:'100 г',ic:'🍤'},
+ {id:'z1',c:'pizza',n:'Маргарита',d:'Томаты, томатный соус, сыр моцарелла, зелёное масло, приправа средиземноморская',o:[['Слайс',130],['30 см',670]],ic:'🍕'},
+ {id:'z2',c:'pizza',n:'Пепперони',d:'Соус пицца, сыр моцарелла, пепперони',o:[['Слайс',130],['30 см',690]],ic:'🍕'},
+ {id:'z3',c:'pizza',n:'Фирменная',d:'Сливочный соус, шампиньоны, моцарелла, курица копчёная, бекон, томаты',o:[['Слайс',130],['30 см',710]],ic:'🍕'},
+ {id:'z4',c:'pizza',n:'Четыре сыра',d:'Сливочный соус, моцарелла, фета, сыр с плесенью, чеддер',o:[['Слайс',130],['30 см',710]],ic:'🧀'},
+ {id:'z5',c:'pizza',n:'Сырный цыплёнок',d:'Сливочный соус, моцарелла, курица, томаты, сыр чеддер',o:[['Слайс',130],['30 см',710]],ic:'🍕'},
+ {id:'h1',c:'hot',n:'Хот-дог классика',d:'Пшеничная булочка, говяжья сосиска, сырный соус, томатный соус, горчица',p:200,ic:'🌭'},
+ {id:'h2',c:'hot',n:'Хот-дог острый',d:'Булочка, говяжья сосиска, острый перец халапеньо, жареный лук, острый соус, горчица',p:210,ic:'🌶️',b:['hot','острый']},
+ {id:'h3',c:'hot',n:'Хот-дог сырный',d:'Булочка, говяжья сосиска, сыр чеддер, сырный соус, фирменный соус',p:210,ic:'🧀'},
+ {id:'h4',c:'hot',n:'Хот-дог корейский',d:'Булочка, говяжья сосиска, морковка по-корейски, жареный лук, томатный соус, горчица',p:210,ic:'🥕'},
+ {id:'h5',c:'hot',n:'Кесадилья',d:'Лаваш, жареная курица, сыр чеддер, фирменный соус',p:150,ic:'🫓'},
+ {id:'h6',c:'hot',n:'Кесадилья острая',d:'Лаваш, жареная курица, чеддер, фирменный соус, капустный салат, халапеньо, жареный лук',p:160,ic:'🌶️',b:['hot','острая']}
+];
+const S={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let cart=S.get('rz_cart',{}), user=S.get('rz_user',null), cat='shawa', stage='cart', sel={}, pick={day:null,time:null}, afterLogin=null;
+const rub=n=>n.toLocaleString('ru-RU')+' ₽';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const byId=id=>MENU.find(m=>m.id===id);
+// ключ корзины: id или id|номер варианта (для пиццы)
+const keyInfo=k=>{const [id,oi]=k.split('|');const m=byId(id);return m.o?{m,name:`${m.n} · ${m.o[oi][0]}`,p:m.o[oi][1]}:{m,name:m.n,p:m.p}};
+const total=()=>Object.entries(cart).reduce((s,[k,q])=>s+keyInfo(k).p*q,0);
+const count=()=>Object.values(cart).reduce((a,b)=>a+b,0);
+const inCart=id=>Object.entries(cart).filter(([k])=>k.split('|')[0]===id).reduce((a,[,q])=>a+q,0);
+
+function renderWho(){document.getElementById('who').innerHTML=user?`<span class="user"><span class="ava">${esc(user.name[0].toUpperCase())}</span><span class="hide-m">${esc(user.name)}</span></span>`:`<button class="btn tg sm" type="button" data-login>Войти</button>`}
+function tabs(){document.getElementById('tabs').innerHTML=CATS.map(([k,t])=>`<button class="tab${k===cat?' on':''}" data-c="${k}" type="button">${t}</button>`).join('')}
+function grid(){
+  document.getElementById('grid').innerHTML=MENU.filter(m=>m.c===cat).map(m=>{
+    const oi=sel[m.id]??1, price=m.o?m.o[oi][1]:m.p, n=inCart(m.id);
+    return `<div class="item"><div class="top"><h4>${esc(m.n)}</h4><span class="ic">${m.ic}</span></div>
+     ${m.b?`<span class="badge ${m.b[0]}">${m.b[1]}</span>`:''}<p>${esc(m.d)}</p>${m.w?`<div class="w">${m.w}</div>`:''}
+     ${m.o?`<div class="opts">${m.o.map((o,i)=>`<button class="opt${i==oi?' on':''}" data-opt="${m.id}" data-i="${i}" type="button">${o[0]} · ${o[1]} ₽</button>`).join('')}</div>`:''}
+     <div class="row"><span class="price">${rub(price)}</span><button class="add${n?' in':''}" data-add="${m.id}" type="button">${n?'В заказе · '+n:'+ В предзаказ'}</button></div></div>`}).join('');
+}
+function save(){S.set('rz_cart',cart);document.querySelectorAll('.cnt').forEach(e=>e.textContent=count());grid();if(stage!=='done')drawer()}
+
+function days(){const r=[],now=new Date();for(let i=0;i<7;i++){const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i);r.push(d)}return r}
+const dkey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; // локальная дата, не UTC
+function slotsFor(d){
+  const r=[],now=new Date(),isToday=d.toDateString()===now.toDateString();
+  for(let h=OPEN;h<CLOSE;h++)for(const mm of [0,30]){if(h===OPEN&&mm===0)continue;const t=new Date(d.getFullYear(),d.getMonth(),d.getDate(),h,mm);r.push({t,ok:!isToday||t-now>=30*60e3})}
+  return r;
+}
+const fmtDay=d=>{const n=new Date(),diff=Math.round((new Date(d.getFullYear(),d.getMonth(),d.getDate())-new Date(n.getFullYear(),n.getMonth(),n.getDate()))/864e5);return diff===0?'Сегодня':diff===1?'Завтра':d.toLocaleDateString('ru-RU',{weekday:'short'})};
+const hhmm=t=>t.toTimeString().slice(0,5);
+
+function drawer(){
+  const body=document.getElementById('dbody'),foot=document.getElementById('dfoot'),ks=Object.keys(cart);
+  if(stage==='done')return;
+  if(!ks.length){body.innerHTML='<p class="empty">Здесь пока пусто.<br>Добавьте что-нибудь из меню 🌯</p>';foot.innerHTML='';return}
+  const list=ks.map(k=>{const x=keyInfo(k);return `<div class="ci"><span style="font-size:26px">${x.m.ic}</span><div class="t">${esc(x.name)}<small>${rub(x.p)}</small></div>
+    <div class="qty"><button data-q="${k}" data-d="-1" type="button">−</button><b>${cart[k]}</b><button data-q="${k}" data-d="1" type="button">+</button></div></div>`}).join('');
+  const D=days(); if(!pick.day||!D.some(d=>dkey(d)===pick.day)){const first=D.find(d=>slotsFor(d).some(s=>s.ok));pick.day=dkey(first);pick.time=null}
+  const cur=D.find(d=>dkey(d)===pick.day), sl=slotsFor(cur);
+  if(pick.time&&!sl.some(s=>s.ok&&hhmm(s.t)===pick.time))pick.time=null;
+  body.innerHTML=`${list}
+   <div class="lbl">День</div>
+   <div class="days">${D.map(d=>`<button class="day${dkey(d)===pick.day?' on':''}" data-day="${dkey(d)}" type="button" ${slotsFor(d).some(s=>s.ok)?'':'disabled'}>${fmtDay(d)}<small>${d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'})}</small></button>`).join('')}</div>
+   <div class="lbl">Время, когда заберёте</div>
+   <div class="slots">${sl.map(s=>`<button class="slot${pick.time===hhmm(s.t)?' on':''}" data-time="${hhmm(s.t)}" type="button" ${s.ok?'':'disabled'}>${hhmm(s.t)}</button>`).join('')}</div>
+   <div class="lbl">Кто заберёт</div>
+   ${user?`<div class="me"><span class="ava">${esc(user.name[0].toUpperCase())}</span><div><b>${esc(user.name)}</b><small>через Telegram · ${esc(user.tg)}</small></div></div>`:`<button class="btn tg" style="width:100%" type="button" data-login>Войти через Telegram</button>`}
+   <div class="lbl">Комментарий</div>
+   <textarea id="note" rows="2" placeholder="Например: без лука, соус отдельно"></textarea>
+   <p class="err" id="err"></p>`;
+  foot.innerHTML=`<div class="sum"><span>Итого</span><span>${rub(total())}</span></div><button class="btn" id="send" type="button">Оформить предзаказ</button><p style="text-align:center;color:var(--muted);font-size:13px;margin-top:10px">Оплата при получении</p>`;
+}
+function openCart(){document.getElementById('shade').classList.add('on');document.getElementById('drawer').classList.add('on');if(stage==='done')stage='cart';drawer()}
+function closeCart(){document.getElementById('shade').classList.remove('on');document.getElementById('drawer').classList.remove('on')}
+function login(then){afterLogin=then||null;document.getElementById('tgModal').classList.add('on');document.getElementById('tgName').focus()}
+document.getElementById('tgOk').onclick=()=>{const n=document.getElementById('tgName').value.trim();if(!n){document.getElementById('tgName').focus();return}
+  user={name:n,tg:'@'+(n.toLowerCase().replace(/[^a-zа-яё0-9]/gi,'')||'guest')+'_demo'};S.set('rz_user',user);document.getElementById('tgModal').classList.remove('on');renderWho();drawer();if(afterLogin)afterLogin()};
+document.getElementById('tgNo').onclick=()=>document.getElementById('tgModal').classList.remove('on');
+
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-c],[data-add],[data-opt],[data-q],[data-open-cart],[data-day],[data-time],[data-login],#send,#again');if(!t)return;
+  if(t.dataset.c){cat=t.dataset.c;tabs();grid()}
+  else if(t.dataset.opt){sel[t.dataset.opt]=+t.dataset.i;grid()}
+  else if(t.dataset.add){const m=byId(t.dataset.add),k=m.o?`${m.id}|${sel[m.id]??1}`:m.id;cart[k]=(cart[k]||0)+1;save()}
+  else if(t.dataset.q){const k=t.dataset.q;cart[k]=(cart[k]||0)+ +t.dataset.d;if(cart[k]<=0)delete cart[k];save()}
+  else if(t.hasAttribute('data-open-cart'))openCart();
+  else if(t.dataset.day){pick.day=t.dataset.day;pick.time=null;drawer()}
+  else if(t.dataset.time){pick.time=t.dataset.time;drawer()}
+  else if(t.hasAttribute('data-login'))login();
+  else if(t.id==='again'){stage='cart';drawer()}
+  else if(t.id==='send'){
+    const err=document.getElementById('err');
+    if(!pick.time){err.textContent='Выберите время, когда заберёте заказ';err.style.display='block';return}
+    if(!user){login(()=>document.getElementById('send').click());return}
+    const no=Math.floor(100+Math.random()*900), d=new Date(pick.day+'T00:00');
+    const when=`${fmtDay(d)}, ${d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'})}, ${pick.time}`;
+    const lines=Object.entries(cart).map(([k,q])=>`• ${keyInfo(k).name} × ${q} — ${rub(keyInfo(k).p*q)}`).join('\n');
+    const note=document.getElementById('note').value.trim();
+    const msg=`🧾 Предзаказ №${no}\n⏰ ${when}\n👤 ${user.name} (${user.tg})\n${lines}\nИтого: ${rub(total())}, оплата при получении${note?'\n💬 '+note:''}`;
+    const orders=S.get('rz_orders',[]);orders.unshift({no,day:pick.day,time:pick.time,user,items:Object.entries(cart).map(([k,q])=>({n:keyInfo(k).name,q,p:keyInfo(k).p})),total:total(),note,status:'new',at:Date.now()});S.set('rz_orders',orders.slice(0,50));
+    cart={};S.set('rz_cart',cart);document.querySelectorAll('.cnt').forEach(e=>e.textContent=0);grid();stage='done';
+    document.getElementById('dbody').innerHTML=`<div class="done"><h3>Предзаказ принят! 🎉</h3><p>Ждём вас ${esc(when.toLowerCase())}</p><div class="no">№${no}</div><p style="font-weight:800">Так он придёт в Telegram магазина:</p><pre>${esc(msg)}</pre><p style="color:var(--muted);font-size:13px;margin-top:10px">Демо: заказ виден только в <a href="admin.html" style="color:var(--gold)">демо-админке</a> на этом устройстве.</p></div>`;
+    document.getElementById('dfoot').innerHTML='<button class="btn" id="again" type="button">Заказать ещё</button>';
+  }
+});
+document.getElementById('shade').onclick=closeCart;document.getElementById('close').onclick=closeCart;
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeCart();document.getElementById('tgModal').classList.remove('on')}});
+renderWho();tabs();save();
+</script>
+</body>
+</html>
