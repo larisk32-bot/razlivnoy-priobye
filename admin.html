@@ -63,6 +63,30 @@ li{display:flex;justify-content:space-between;gap:10px;font-size:15px;padding:3p
 .empty{text-align:center;color:var(--muted);padding:40px 0}
 .note{margin-top:26px;font-size:14px;color:var(--muted);text-align:center}
 .hide{display:none!important}
+.ptabs{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none}
+.ptab{flex:none;background:var(--bg2);border:1px solid var(--line);color:var(--muted);border-radius:14px;padding:11px 16px;font-weight:800;font-size:15px}
+.ptab.on{background:var(--gold);border-color:var(--gold);color:var(--bg)}
+.hint{color:var(--muted);font-size:15px;margin:-6px 0 16px}
+.pause{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:12px 16px;margin-bottom:18px;font-weight:800}
+.pause.on{background:#4a1410;border-color:var(--red)}
+.sw{position:relative;width:52px;height:30px;flex:none;border-radius:999px;border:0;background:var(--bg3)}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .15s}
+.sw.on{background:var(--green)}.sw.on::after{left:25px}
+.sw.red.on{background:var(--red)}
+.mgrp{font:800 13px/1 Nunito;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:20px 0 8px}
+.mrow{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-bottom:8px}
+.mrow.off{opacity:.55}
+.mrow .nm{flex:1;font-weight:800;font-size:15px;line-height:1.25}
+.mrow .nm small{display:block;color:var(--muted);font-weight:600}
+.mrow input{width:84px;font:800 16px Rubik;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;text-align:right}
+.mrow input.chg{border-color:var(--gold);color:var(--gold)}
+.days,.slots{display:flex;gap:8px;flex-wrap:wrap}
+.day,.slot{border:1px solid var(--line);background:var(--bg2);border-radius:12px;padding:9px 12px;font-weight:800;font-size:14px;color:var(--muted);text-align:center}
+.day small{display:block;font-weight:600;font-size:12px}
+.day.on{background:var(--gold);border-color:var(--gold);color:var(--bg)}
+.slot{min-width:72px}.slot.closed{background:#4a1410;border-color:var(--red);color:#ffb3ad;text-decoration:line-through}
+.saved{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--green);color:#fff;font-weight:800;padding:10px 18px;border-radius:999px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none}
+.saved.on{opacity:1}
 @media (max-width:600px){.stat b{font-size:22px}.stat span{font-size:12px}}
 </style>
 </head>
@@ -89,6 +113,25 @@ li{display:flex;justify-content:space-between;gap:10px;font-size:15px;padding:3p
 <div id="panel" class="hide">
   <div class="top"><div class="wrap"><span class="logo"><img src="img/logo_strip.jpg" alt="Разливной"></span><button class="out" id="logout" type="button">Выйти</button></div></div>
   <main class="wrap">
+    <div class="ptabs">
+      <button class="ptab on" data-p="orders" type="button">🧾 Заказы</button>
+      <button class="ptab" data-p="menu" type="button">🍔 Меню и цены</button>
+      <button class="ptab" data-p="slots" type="button">⏰ Время</button>
+    </div>
+    <div class="pause" id="pauseBox"></div>
+    <div id="pg-menu" class="hide">
+      <h2>Стоп-лист и цены</h2>
+      <p class="hint">Выключите позицию, и на сайте она станет «нет в наличии». Цену меняйте прямо в поле: сохраняется сразу, сайт обновится в течение минуты.</p>
+      <div id="menuList"></div>
+    </div>
+    <div id="pg-slots" class="hide">
+      <h2>Закрыть время</h2>
+      <p class="hint">Завал или нужно уйти? Закройте отдельные слоты или весь день. Покупатели не смогут выбрать закрытое время.</p>
+      <div class="days" id="aDays"></div>
+      <div class="tools" style="margin-top:12px"><button class="flt" id="closeDay" type="button">Закрыть весь день</button><button class="flt" id="openDay" type="button">Открыть весь день</button></div>
+      <div class="slots" id="aSlots"></div>
+    </div>
+    <div id="pg-orders">
     <h2>Предзаказы</h2>
     <div class="stats">
       <div class="stat"><b id="sNew">0</b><span>ждут готовки</span></div>
@@ -102,8 +145,10 @@ li{display:flex;justify-content:space-between;gap:10px;font-size:15px;padding:3p
     </div>
     <div id="list"></div>
     <p class="note">Новые предзаказы также приходят в Telegram от @razlivnoy_priobye_bot. Статусы синхронизируются: нажали «Готов» здесь — обновится и в Telegram, и покупателю придёт сообщение. Список обновляется каждые 30 секунд.</p>
+    </div>
   </main>
 </div>
+<div class="saved" id="saved">Сохранено ✓</div>
 
 <script>
 const API='https://razlivnoy-priobye.marsel20172.workers.dev';
@@ -141,7 +186,7 @@ document.getElementById('list').addEventListener('click',async e=>{const b=e.tar
   if(b.dataset.s==='cancelled'&&!confirm('Отменить предзаказ №'+b.dataset.id+'?'))return;
   b.disabled=true;await api('/api/status',{method:'POST',body:JSON.stringify({id:+b.dataset.id,status:b.dataset.s})}).catch(()=>{});load()});
 document.querySelectorAll('.flt').forEach(b=>b.onclick=()=>{document.querySelectorAll('.flt').forEach(x=>x.classList.toggle('on',x===b));filter=b.dataset.f;render()});
-function show(on){document.getElementById('login').classList.toggle('hide',on);document.getElementById('panel').classList.toggle('hide',!on);clearInterval(timer);if(on){load();timer=setInterval(load,30000)}else widget()}
+function show(on){document.getElementById('login').classList.toggle('hide',on);document.getElementById('panel').classList.toggle('hide',!on);clearInterval(timer);if(on){load();loadState().catch(()=>{});timer=setInterval(load,30000)}else widget()}
 function enter(a){auth=a;try{sessionStorage.setItem('rz_auth',a)}catch(e){}show(true)}
 function logout(){auth=null;try{sessionStorage.removeItem('rz_auth')}catch(e){}show(false)}
 function widget(){const box=document.getElementById('tgw');if(box.childElementCount)return;const sc=document.createElement('script');sc.async=true;sc.src='https://telegram.org/js/telegram-widget.js?22';
@@ -151,6 +196,38 @@ document.getElementById('pwForm').addEventListener('submit',async e=>{e.preventD
   const lg=document.getElementById('lg').value.trim().toLowerCase(), pw=document.getElementById('pw').value;
   const ok=lg==='admin'&&(await fetch(API+'/api/orders',{headers:{Authorization:'Bearer '+pw}}).then(r=>r.ok).catch(()=>false));
   document.getElementById('lerr').classList.toggle('hide',ok);if(ok){document.getElementById('pw').value='';enter('Bearer '+pw)}});
+// ── стоп-лист, цены, закрытые слоты, пауза ──
+let ST=null, aDay=null, saveT=null;
+const GRP={s:'Шаурма',u:'Бургеры',n:'Закуски',z:'Пицца',h:'Хот-доги'};
+const toast=t=>{const el=document.getElementById('saved');el.textContent=t;el.classList.add('on');setTimeout(()=>el.classList.remove('on'),1400)};
+async function loadState(){ST=await api('/api/state');renderState()}
+async function pushState(){const {menu,...s}=ST;ST=await api('/api/state',{method:'POST',body:JSON.stringify(s)});renderState();toast('Сохранено ✓')}
+function renderState(){if(!ST)return;
+  const pb=document.getElementById('pauseBox');pb.classList.toggle('on',ST.paused);
+  pb.innerHTML=`<span>${ST.paused?'⏸ Приём предзаказов на паузе':'▶ Предзаказы принимаются'}</span><button class="sw red${ST.paused?' on':''}" id="pauseSw" type="button" aria-label="Пауза приёма"></button>`;
+  let html='',last='';
+  for(const [k,[n,p]] of Object.entries(ST.menu)){const g=GRP[k[0]];if(g!==last){html+=`<div class="mgrp">${g}</div>`;last=g}
+    const off=ST.stop.includes(k), cur=ST.prices[k]??p;
+    html+=`<div class="mrow${off?' off':''}"><button class="sw${off?'':' on'}" data-stop="${k}" type="button" aria-label="В наличии"></button><div class="nm">${esc(n)}<small>${off?'нет в наличии':'в наличии'}${ST.prices[k]?` · было ${p} ₽`:''}</small></div><input class="${ST.prices[k]?'chg':''}" data-price="${k}" inputmode="numeric" value="${cur}"></div>`}
+  document.getElementById('menuList').innerHTML=html;
+  renderSlots()}
+function localDays(){const r=[],n=new Date();for(let i=0;i<7;i++){const d=new Date(n.getFullYear(),n.getMonth(),n.getDate()+i);r.push(`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`)}return r}
+const SLOTS=(()=>{const r=[];for(let h=10;h<23;h++)for(const m of ['00','30']){if(h===10&&m==='00')continue;r.push(`${pad(h)}:${m}`)}return r})();
+function renderSlots(){const D=localDays();if(!aDay||!D.includes(aDay))aDay=D[0];const cl=ST.closed[aDay]||[];
+  document.getElementById('aDays').innerHTML=D.map((d,i)=>{const dt=new Date(d+'T00:00');const c=(ST.closed[d]||[]).length;return `<button class="day${d===aDay?' on':''}" data-aday="${d}" type="button">${i===0?'Сегодня':i===1?'Завтра':dt.toLocaleDateString('ru-RU',{weekday:'short'})}<small>${dt.toLocaleDateString('ru-RU',{day:'numeric',month:'short'})}${c?` · 🔒${c}`:''}</small></button>`}).join('');
+  document.getElementById('aSlots').innerHTML=SLOTS.map(t=>`<button class="slot${cl.includes(t)?' closed':''}" data-aslot="${t}" type="button">${t}</button>`).join('')}
+document.addEventListener('click',e=>{const t=e.target.closest('#pauseSw,[data-stop],[data-aday],[data-aslot],#closeDay,#openDay,.ptab');if(!t||!ST&&!t.classList.contains('ptab'))return;
+  if(t.classList.contains('ptab')){document.querySelectorAll('.ptab').forEach(x=>x.classList.toggle('on',x===t));['orders','menu','slots'].forEach(p=>document.getElementById('pg-'+p).classList.toggle('hide',p!==t.dataset.p));if(t.dataset.p!=='orders')loadState();return}
+  if(t.id==='pauseSw'){if(!ST.paused&&!confirm('Поставить приём предзаказов на паузу?'))return;ST.paused=!ST.paused}
+  else if(t.dataset.stop){const k=t.dataset.stop;ST.stop=ST.stop.includes(k)?ST.stop.filter(x=>x!==k):[...ST.stop,k]}
+  else if(t.dataset.aday){aDay=t.dataset.aday;renderSlots();return}
+  else if(t.dataset.aslot){const c=new Set(ST.closed[aDay]||[]);c.has(t.dataset.aslot)?c.delete(t.dataset.aslot):c.add(t.dataset.aslot);ST.closed={...ST.closed,[aDay]:[...c]}}
+  else if(t.id==='closeDay'){ST.closed={...ST.closed,[aDay]:[...SLOTS]}}
+  else if(t.id==='openDay'){ST.closed={...ST.closed,[aDay]:[]}}
+  renderState();pushState().catch(()=>toast('Не сохранилось'))});
+document.getElementById('menuList').addEventListener('change',e=>{const i=e.target.closest('[data-price]');if(!i)return;const v=Math.round(Number(i.value));
+  if(!(v>=1&&v<=100000)){i.value=ST.prices[i.dataset.price]??ST.menu[i.dataset.price][1];return}
+  ST.prices={...ST.prices,[i.dataset.price]:v};pushState().catch(()=>toast('Не сохранилось'))});
 document.getElementById('logout').onclick=logout;
 show(!!auth);
 </script>

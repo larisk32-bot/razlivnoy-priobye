@@ -297,11 +297,14 @@ const API='https://razlivnoy-priobye.marsel20172.workers.dev';
 let cart=S.get('rz_cart',{}), user=S.get('rz_user',null);
 if(user&&!user.auth)user=null; // старый демо-вход без подписи Telegram
 let cat='shawa', stage='cart', sel={}, pick={day:null,time:null}, afterLogin=null;
+// настройки из админки: стоп-лист, свои цены, закрытые слоты, пауза приёма
+let ST={stop:[],prices:{},closed:{},paused:false};
+const PR=(k,def)=>ST.prices[k]??def, OFF=k=>ST.stop.includes(k);
 const rub=n=>n.toLocaleString('ru-RU')+' ₽';
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const byId=id=>MENU.find(m=>m.id===id);
 // ключ корзины: id или id|номер варианта (для пиццы)
-const keyInfo=k=>{const [id,oi]=k.split('|');const m=byId(id);return m.o?{m,name:`${m.n} · ${m.o[oi][0]}`,p:m.o[oi][1]}:{m,name:m.n,p:m.p}};
+const keyInfo=k=>{const [id,oi]=k.split('|');const m=byId(id);return m.o?{m,name:`${m.n} · ${m.o[oi][0]}`,p:PR(k,m.o[oi][1])}:{m,name:m.n,p:PR(k,m.p)}};
 const total=()=>Object.entries(cart).reduce((s,[k,q])=>s+keyInfo(k).p*q,0);
 const count=()=>Object.values(cart).reduce((a,b)=>a+b,0);
 const inCart=id=>Object.entries(cart).filter(([k])=>k.split('|')[0]===id).reduce((a,[,q])=>a+q,0);
@@ -310,11 +313,11 @@ function renderWho(){document.getElementById('who').innerHTML=user?`<span class=
 function tabs(){document.getElementById('tabs').innerHTML=CATS.map(([k,t])=>`<button class="tab${k===cat?' on':''}" data-c="${k}" type="button">${t}</button>`).join('')}
 function grid(){
   document.getElementById('grid').innerHTML=MENU.filter(m=>m.c===cat).map(m=>{
-    const oi=sel[m.id]??1, price=m.o?m.o[oi][1]:m.p, n=inCart(m.id);
+    const oi=sel[m.id]??1, key=m.o?`${m.id}|${oi}`:m.id, price=keyInfo(key).p, n=inCart(m.id), off=OFF(key);
     return `<div class="item"><div class="top"><h4>${esc(m.n)}</h4><span class="ic">${m.ic}</span></div>
      ${m.b?`<span class="badge ${m.b[0]}">${m.b[1]}</span>`:''}<p>${esc(m.d)}</p>${m.w?`<div class="w">${m.w}</div>`:''}
-     ${m.o?`<div class="opts">${m.o.map((o,i)=>`<button class="opt${i==oi?' on':''}" data-opt="${m.id}" data-i="${i}" type="button">${o[0]} · ${o[1]} ₽</button>`).join('')}</div>`:''}
-     <div class="row"><span class="price">${rub(price)}</span><button class="add${n?' in':''}" data-add="${m.id}" type="button">${n?'В заказе · '+n:'+ В предзаказ'}</button></div></div>`}).join('');
+     ${m.o?`<div class="opts">${m.o.map((o,i)=>`<button class="opt${i==oi?' on':''}" data-opt="${m.id}" data-i="${i}" type="button">${o[0]} · ${OFF(m.id+'|'+i)?'нет':PR(m.id+'|'+i,o[1])+' ₽'}</button>`).join('')}</div>`:''}
+     <div class="row"><span class="price">${rub(price)}</span>${off?'<button class="add" type="button" disabled style="opacity:.45">Нет в наличии</button>':`<button class="add${n?' in':''}" data-add="${m.id}" type="button">${n?'В заказе · '+n:'+ В предзаказ'}</button>`}</div></div>`}).join('');
 }
 function save(){S.set('rz_cart',cart);document.querySelectorAll('.cnt').forEach(e=>e.textContent=count());grid();if(stage!=='done')drawer()}
 
@@ -322,7 +325,7 @@ function days(){const r=[],now=new Date();for(let i=0;i<7;i++){const d=new Date(
 const dkey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; // локальная дата, не UTC
 function slotsFor(d){
   const r=[],now=new Date(),isToday=d.toDateString()===now.toDateString();
-  for(let h=OPEN;h<CLOSE;h++)for(const mm of [0,30]){if(h===OPEN&&mm===0)continue;const t=new Date(d.getFullYear(),d.getMonth(),d.getDate(),h,mm);r.push({t,ok:!isToday||t-now>=30*60e3})}
+  for(let h=OPEN;h<CLOSE;h++)for(const mm of [0,30]){if(h===OPEN&&mm===0)continue;const t=new Date(d.getFullYear(),d.getMonth(),d.getDate(),h,mm);r.push({t,ok:(!isToday||t-now>=30*60e3)&&!(ST.closed[dkey(d)]||[]).includes(hhmm(t))})}
   return r;
 }
 const fmtDay=d=>{const n=new Date(),diff=Math.round((new Date(d.getFullYear(),d.getMonth(),d.getDate())-new Date(n.getFullYear(),n.getMonth(),n.getDate()))/864e5);return diff===0?'Сегодня':diff===1?'Завтра':d.toLocaleDateString('ru-RU',{weekday:'short'})};
@@ -332,12 +335,12 @@ function drawer(){
   const body=document.getElementById('dbody'),foot=document.getElementById('dfoot'),ks=Object.keys(cart);
   if(stage==='done')return;
   if(!ks.length){body.innerHTML='<p class="empty">Здесь пока пусто.<br>Добавьте что-нибудь из меню 🌯</p>';foot.innerHTML='';return}
-  const list=ks.map(k=>{const x=keyInfo(k);return `<div class="ci"><span style="font-size:26px">${x.m.ic}</span><div class="t">${esc(x.name)}<small>${rub(x.p)}</small></div>
+  const list=ks.map(k=>{const x=keyInfo(k);return `<div class="ci"><span style="font-size:26px">${x.m.ic}</span><div class="t">${esc(x.name)}<small>${OFF(k)?'<span style="color:#ff8a80">нет в наличии, уберите</span>':rub(x.p)}</small></div>
     <div class="qty"><button data-q="${k}" data-d="-1" type="button">−</button><b>${cart[k]}</b><button data-q="${k}" data-d="1" type="button">+</button></div></div>`}).join('');
   const D=days(); if(!pick.day||!D.some(d=>dkey(d)===pick.day)){const first=D.find(d=>slotsFor(d).some(s=>s.ok));pick.day=dkey(first);pick.time=null}
   const cur=D.find(d=>dkey(d)===pick.day), sl=slotsFor(cur);
   if(pick.time&&!sl.some(s=>s.ok&&hhmm(s.t)===pick.time))pick.time=null;
-  body.innerHTML=`${list}
+  body.innerHTML=`${ST.paused?'<p class="err" style="display:block">Сейчас предзаказы временно не принимаются. Позвоните нам: +7 922 444-18-82</p>':''}${list}
    <div class="lbl">День</div>
    <div class="days">${D.map(d=>`<button class="day${dkey(d)===pick.day?' on':''}" data-day="${dkey(d)}" type="button" ${slotsFor(d).some(s=>s.ok)?'':'disabled'}>${fmtDay(d)}<small>${d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'})}</small></button>`).join('')}</div>
    <div class="lbl">Время, когда заберёте</div>
@@ -347,7 +350,7 @@ function drawer(){
    <div class="lbl">Комментарий</div>
    <textarea id="note" rows="2" placeholder="Например: без лука, соус отдельно"></textarea>
    <p class="err" id="err"></p>`;
-  foot.innerHTML=`<div class="sum"><span>Итого</span><span>${rub(total())}</span></div><button class="btn" id="send" type="button">Оформить предзаказ</button><p style="text-align:center;color:var(--muted);font-size:13px;margin-top:10px">Оплата при получении</p>`;
+  foot.innerHTML=`<div class="sum"><span>Итого</span><span>${rub(total())}</span></div><button class="btn" id="send" type="button" ${ST.paused||ks.some(OFF)?'disabled style="opacity:.5"':''}>Оформить предзаказ</button><p style="text-align:center;color:var(--muted);font-size:13px;margin-top:10px">Оплата при получении</p>`;
 }
 function openCart(){document.getElementById('shade').classList.add('on');document.getElementById('drawer').classList.add('on');if(stage==='done')stage='cart';drawer()}
 function closeCart(){document.getElementById('shade').classList.remove('on');document.getElementById('drawer').classList.remove('on')}
@@ -365,7 +368,7 @@ document.addEventListener('click',e=>{
   const t=e.target.closest('[data-c],[data-add],[data-opt],[data-q],[data-open-cart],[data-day],[data-time],[data-login],#send,#again');if(!t)return;
   if(t.dataset.c){cat=t.dataset.c;tabs();grid()}
   else if(t.dataset.opt){sel[t.dataset.opt]=+t.dataset.i;grid()}
-  else if(t.dataset.add){const m=byId(t.dataset.add),k=m.o?`${m.id}|${sel[m.id]??1}`:m.id;cart[k]=(cart[k]||0)+1;save()}
+  else if(t.dataset.add){const m=byId(t.dataset.add),k=m.o?`${m.id}|${sel[m.id]??1}`:m.id;if(OFF(k))return;cart[k]=(cart[k]||0)+1;save()}
   else if(t.dataset.q){const k=t.dataset.q;cart[k]=(cart[k]||0)+ +t.dataset.d;if(cart[k]<=0)delete cart[k];save()}
   else if(t.hasAttribute('data-open-cart'))openCart();
   else if(t.dataset.day){pick.day=t.dataset.day;pick.time=null;drawer()}
@@ -391,6 +394,8 @@ document.addEventListener('click',e=>{
 document.getElementById('shade').onclick=closeCart;document.getElementById('close').onclick=closeCart;
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeCart();document.getElementById('tgModal').classList.remove('on')}});
 renderWho();tabs();save();
+function loadState(){fetch(API+'/api/state',{cache:'no-store'}).then(r=>r.json()).then(j=>{ST={stop:j.stop||[],prices:j.prices||{},closed:j.closed||{},paused:!!j.paused};save()}).catch(()=>{})}
+loadState();setInterval(loadState,60000);
 </script>
 </body>
 </html>
