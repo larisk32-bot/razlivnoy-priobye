@@ -1,0 +1,19 @@
+{
+  "name": "Разливной Приобье — предзаказ",
+  "short_name": "Разливной",
+  "description": "Предзаказ еды в «Разливном», пгт Приобье, ул. Школьная, 9",
+  "lang": "ru",
+  "start_url": "/?source=app",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#1b120c",
+  "theme_color": "#1b120c",
+  "icons": [
+    {"src": "/img/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "/img/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "/img/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ],
+  "shortcuts": [
+    {"name": "Админка", "short_name": "Админка", "url": "/admin.html", "icons": [{"src": "/img/icon-192.png", "sizes": "192x192"}]}
+  ]
+}

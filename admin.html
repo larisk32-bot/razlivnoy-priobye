@@ -5,6 +5,13 @@
 <script>if(/github\.io$|pages\.dev$|^www\./.test(location.hostname))location.replace("https://razlivnoy-priobye.ru/"+location.pathname.split("/").pop().replace(/^admin$/,"admin.html")+location.search+location.hash)</script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#1b120c">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Разливной">
+
 <meta name="robots" content="noindex, nofollow">
 <title>Предзаказы — «Разливной» (админ)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -243,6 +250,8 @@ document.getElementById('menuList').addEventListener('change',e=>{const i=e.targ
   ST.prices={...ST.prices,[i.dataset.price]:v};pushState().catch(()=>toast('Не сохранилось'))});
 document.getElementById('logout').onclick=logout;
 show(!!auth);
+
+if('serviceWorker' in navigator&&location.hostname.endsWith('razlivnoy-priobye.ru'))navigator.serviceWorker.register('/sw.js').catch(()=>{});
 </script>
 </body>
 </html>

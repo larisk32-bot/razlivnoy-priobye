@@ -1,0 +1,6 @@
+AddType application/manifest+json .webmanifest
+RewriteEngine On
+# всегда https и без www (HTTPS у REG.RU снимает nginx, смотрим X-Forwarded-Proto)
+RewriteCond %{HTTP:X-Forwarded-Proto} =http [OR]
+RewriteCond %{HTTP_HOST} ^www\. [NC]
+RewriteRule ^ https://razlivnoy-priobye.ru%{REQUEST_URI} [R=301,L]

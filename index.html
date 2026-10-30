@@ -5,6 +5,13 @@
 <script>if(/github\.io$|pages\.dev$|^www\./.test(location.hostname))location.replace("https://razlivnoy-priobye.ru/"+location.pathname.split("/").pop().replace(/^admin$/,"admin.html")+location.search+location.hash)</script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#1b120c">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Разливной">
+
 <meta name="robots" content="noindex, nofollow">
 <title>Разливной, Приобье: предзаказ еды</title>
 <meta name="description" content="Разливной пивмаркет, Приобье. Шаурма, бургеры, пицца, хот-доги и закуски. Предзаказ к нужному времени: оформили, пришли и забрали горячим.">
@@ -188,6 +195,7 @@ textarea{font:600 15px Nunito;color:var(--text);background:var(--bg);border:1px 
           <div class="cta">
             <a class="btn" href="#menu">Сделать предзаказ</a>
             <button class="btn tg" type="button" data-login>Войти через Telegram</button>
+            <button class="btn ghost" type="button" id="installBtn">📲 Установить приложение</button>
           </div>
         </div>
         <div class="how">
@@ -258,6 +266,15 @@ textarea{font:600 15px Nunito;color:var(--text);background:var(--bg);border:1px 
     <p id="tgWait" style="margin:14px 0 0;font-size:14px;color:#777">Готовим ссылку…</p>
     <div id="tgw" style="min-height:0;display:flex;justify-content:center;margin-top:10px"></div>
     <button class="no2" type="button" id="tgNo">Отмена</button>
+  </div>
+</div>
+
+<div class="modal" id="instModal">
+  <div class="mbox">
+    <div style="font-size:52px;line-height:1">📲</div>
+    <h3 style="margin-top:10px">Приложение «Разливной»</h3>
+    <div id="instText" style="text-align:left;color:#444;font-size:15px;line-height:1.5;margin:10px 0 16px"></div>
+    <button class="btn" type="button" id="instOk" style="width:100%">Понятно</button>
   </div>
 </div>
 
@@ -420,6 +437,23 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeCart();documen
 renderWho();tabs();save();
 function loadState(){fetch(API+'/api/state',{cache:'no-store'}).then(r=>r.json()).then(j=>{ST={stop:j.stop||[],prices:j.prices||{},closed:j.closed||{},paused:!!j.paused};save()}).catch(()=>{})}
 loadState();setInterval(loadState,60000);
+
+if('serviceWorker' in navigator&&location.hostname.endsWith('razlivnoy-priobye.ru'))navigator.serviceWorker.register('/sw.js').catch(()=>{});
+
+// установка как приложения (PWA): Android/Chrome — системное окно, iPhone — подсказка «На экран Домой»
+let instEvt=null;
+const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+if(standalone)document.getElementById('installBtn').style.display='none';
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();instEvt=e});
+addEventListener('appinstalled',()=>{document.getElementById('installBtn').style.display='none'});
+document.getElementById('installBtn').onclick=async()=>{
+  if(instEvt){instEvt.prompt();await instEvt.userChoice;instEvt=null;return}
+  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  document.getElementById('instText').innerHTML=ios
+    ?'1. Нажмите кнопку <b>«Поделиться»</b> ⬆️ внизу Safari.<br>2. Выберите <b>«На экран „Домой“»</b>.<br>3. Нажмите <b>«Добавить»</b>, и значок «Разливного» появится на экране.'
+    :'1. Откройте меню браузера <b>⋮</b> (три точки справа вверху).<br>2. Выберите <b>«Установить приложение»</b> или <b>«Добавить на главный экран»</b>.<br>3. Подтвердите, и значок «Разливного» появится на экране.<br><br>На компьютере: значок установки ⊕ справа в адресной строке Chrome или Edge.';
+  document.getElementById('instModal').classList.add('on')};
+document.getElementById('instOk').onclick=()=>document.getElementById('instModal').classList.remove('on');
 </script>
 </body>
 </html>
